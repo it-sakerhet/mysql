@@ -1,25 +1,38 @@
 #!/bin/bash
-#Diyar P, diyar@synlex.se
+#diyar@synlex.se
 
-sudo apt-get install mysql-client
+    if ! command -v mysql &> /dev/null; then
+        echo " Installera ... om inte finns redan"
+        sudo apt-get install mysql-client
+    fi
+ 
 
-MYSQL_HOST="PUBLIC IP"
+function LoggaIn() {
+    local host="$1"
+    local port="$2"
+    local user="$3"
+    local password="$4"
+
+  
+    nc -zv -w 1 "$host" "$port"
+
+ 
+    if [ $? -eq 0 ]; then
+        echo " MYSQL Anslutas "
+ 
+        mysql -h "$host" -P "$port" -u "$user" -p"$password"
+ 
+
+    else
+        echo " MYSQL KÖRS INTE $host:$port"
+    fi
+}
+
+# Detaljer 
+MYSQL_HOST="192.168.1.240"
 MYSQL_PORT="3306"
 MYSQL_USER="root"
 MYSQL_PASSWORD="password"
 
-# Kontrollera om vi kan nå servern med en port 3306
-nc -zv -w 1 "$MYSQL_HOST" "$MYSQL_PORT"
-
-
-if [ $? -eq 0 ]; then
-    echo " MySQL körs"
-    
-    # Ansluta till mysql
-    mysql -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASSWORD"
-    
  
-    
-else
-    echo "MYSQL KÖRS INTE $MYSQL_HOST:$MYSQL_PORT"
-fi
+LoggaIn "$MYSQL_HOST" "$MYSQL_PORT" "$MYSQL_USER" "$MYSQL_PASSWORD"
